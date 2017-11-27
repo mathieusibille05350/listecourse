@@ -115,5 +115,3 @@ function aff_nb_caractere_a_saisir(zone) {
     }
     )
     };
-
-    function aff_car[nb_de_caractere_mini]

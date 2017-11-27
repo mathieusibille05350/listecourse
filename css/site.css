@@ -34,7 +34,7 @@ margin: 20px;
     background-color: blue;
 }
 .bandeau {
- height: 50px;
+ 
 background-color: blueviolet;
 
 }
@@ -76,5 +76,9 @@ background-color: blueviolet;
         cursor: pointer;
 }
 
-
+.checked
+{
+    background-color: antiquewhite;
+    text-decoration:line-through
+}
 

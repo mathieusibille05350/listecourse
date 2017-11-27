@@ -13,6 +13,7 @@ $bdd = new PDO('mysql:host=localhost;dbname=formation;charset=utf8', 'root', '')
 
 echo "<h2>Lire la BDD (Read)</h2>";
 
+
 $requete = "SELECT * FROM fruits";
 
 if ($req_fruits = $bdd->query($requete)) {
