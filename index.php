@@ -18,7 +18,7 @@
     <!-- <script src="js/bootstrap.min.js"  type="text/javascript"></script> -->
     <script src="js/bootstrap-3.3.7.js" type="text/javascript"></script>
     <script src="js/site.js" type="text/javascript"></script>
-    <script src="js/jquery.dataTables.min.js" type="text/javascript"></script>
+   <!-- <script src="js/jquery.dataTables.min.js" type="text/javascript"></script> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>liste de Course</title>
 </head>
@@ -31,7 +31,7 @@
                     <h1>Ma petite liste de course</h1>
                 </div>
                 <nav class="navbar navbar-default">
-                    <div class="container-fluid">
+                    <div class="container">
 
                         <div class="navbar-header">
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1" aria-expanded="false"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
@@ -71,8 +71,24 @@
         <container>
             <div role="tabpanel">
                 <div role="tabpanel">
-                    <?php $requete = "SELECT * FROM fruits";
-
+                    <?php 
+                    if (isset($_GET['DESC'])){ 
+                    $requete = "SELECT * FROM fruits ORDER BY nom DESC";
+                       
+                    }
+                    elseif (isset($_GET['QDESC']) )
+                    {
+                    $requete = "SELECT * FROM fruits ORDER BY quantite DESC";
+                    }
+                    elseif (isset($_GET['QASC']) )
+                    {
+                    $requete = "SELECT * FROM fruits ORDER BY quantite ASC";
+                    }
+                    else
+                    {
+                    $requete = "SELECT * FROM fruits ORDER BY nom ASC";   
+                    } // defini le sens d'affichage des colonnes
+                    
 
         if ($req_fruits = $bdd->query($requete))
             {   
@@ -82,12 +98,13 @@
     <table class="table table-bordered">'); 
                     echo(' <thead>
             <tr>
-                <th>ID</th>
-                <th>Produits</th>
-                <th><i class="scicon-awesome-basket" aria-hidden="true"></i></th>
-                <th><i class="fa fa-trash-o" aria-hidden="true"></i></th>
-                <th>Q</th>
-                <th>&nbsp;<i class="fa fa-plus"></i> / <i class="fa fa-minus"></i></th>
+               
+                <th>Produits <a href="index.php?ASC"><i class="fa fa-plus"></i></a> / <a href="index.php?DESC"><i class="fa fa-minus"></i></a></th>
+                <th class ="text-center"><i class="fa fa-shopping-cart" aria-hidden="true"></i>
+</th>
+                <th class ="text-center"><i class="fa fa-trash-o" aria-hidden="true"></i></th>
+                <th class ="text-center">Q <a href="index.php?QASC"><i class="fa fa-plus"></i></a> / <a href="index.php?QDESC"><i class="fa fa-minus"></i></a></th>
+                <th class ="text-center">&nbsp;<i class="fa fa-plus"></i> / <i class="fa fa-minus"></i></th>
             </tr>
         </thead>');
      foreach ($les_fruits as $row)
@@ -101,43 +118,57 @@
              else {
                  $checked = "";
              };
-    
+    // $ligID = $row['id_fruit'];
        echo(' <tbody>
-            <tr>
-                <th scope="row">1</th>');
-                echo "<td class=".$checked.">".$row['nom']."</td>";
-               echo '<td><form><input type="checkbox" '.$checked.' ></form></td>';
-              echo '  <td><a href="http://127.0.0.1/listedecoursephp/index.php?efface='.$row['id_fruit'].'" target="_self"><i class="fa fa-trash-o" aria-hidden="true"></i>
+            <tr id='.$row['id_fruit'].' >
+                ');
+                echo '<td class='.$checked.'><a href="index.php?edition='.$row['id_fruit'].'&nom='.$row['nom'].'&quantite='.$row['quantite'].'">'.$row['nom'].'</a></td>';
+               echo '<td  class="text-center '.$row['id_fruit'].'"><a href="index.php?caddiedown='.$row['id_fruit'].'&caddie='.$row['caddie'].' target="_self"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a>
+</td>';
+              echo '  <td  class="text-center '.$row['id_fruit'].'"><a href="index.php?efface='.$row['id_fruit'].' target="_self"><i class="fa fa-trash-o" aria-hidden="true"></i>
         </i></a></td>';
-                echo "<td>".$row['quantite']."</td>";
-               echo '<td>&nbsp;<i class="fa fa-plus"></i> / <i class="fa fa-minus"></i></td>';
+                echo "<td align=right>".$row['quantite']."</td>";
+               echo '<td class ="text-center"><a href="index.php?plus='.$row['id_fruit'].'&quantite='.$row['quantite'].'"<i class="fa fa-plus"></i></a> / <a href="index.php?moins='.$row['id_fruit'].'&quantite='.$row['quantite'].'"<i class="fa fa-minus"></i></a></td>';
            }
           echo '  </tr>
         </tbody>
     </table>';
             echo "Vous avez ".compteQ(). " Articles a acheter au total<br>";
             echo "Vous avez encore ".compteR()." Articles a mettre dans le caddie<br>";
-         
-                ?>
+                              $id_modif = "";
+                              $nom = "";
+                              $quantite = "";
+                if (isset($_GET['edition'])){
+                                $bouton = "Modifier";
+                                $id_modif = $_GET['edition'];
+                                $nom = $_GET['nom'];
+                                $quantite = $_GET['quantite'];
+                }
+                            else {
+                                $bouton = "Ajouter";
+                            }
+                             ?>
                     <form action="index.php" method="get">
                         <div class="form-group">
-                            <input type="hidden" class="form-control" id="nom" placeholder="Article" name="fruit">
-                            <input type="hidden" class="form-control" id="caddie" placeholder="Article" name="caddie" values="0">
-                            <label for="nom">Ajouter un produit</label>
-                            <input type="text" class="form-control" id="nom" placeholder="Article" name="nom">
+                            <input type="hidden" class="form-control" id="index"  name="id_fruit" value="<?php echo $id_modif; ?>">
+                            <input type="hidden" class="form-control" name ='UouI' value="<?php echo $bouton; ?>">
+                            <input type="hidden" class="form-control" id="caddie"  name="caddie" values="0">
+                            <label for="nom"><?php echo $bouton; ?> un produit</label>
+                            <input type="text" value ="<?php echo $nom; ?>" class="form-control" id="nom" placeholder="Article" name="nom">
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputPassword1">Sa Quantité :</label>
+                            <label >Sa Quantité :</label>
                         
-                            <input type="int" class="form-control" id="quantite" placeholder="0" name="quantite">
+                            <input  type="number" value="<?php echo $quantite; ?>" min="0" max="128" class="form-control" id="quantite" placeholder="0" name="quantite">
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputPassword1">Son prix :</label>
+                            <label >Son prix :</label>
                             <input type="float" class="form-control" id="prix" placeholder="0" name="prix">
                         </div>
 
 
-                        <button type="submit" class="btn btn-default">Créer l'article</button>
+                        <button type="submit" class="btn btn-default">
+                            <?php echo $bouton; ?></button>
                     </form>
                 </div>
 
@@ -149,74 +180,6 @@
     <footer>
         <div class="bandeau">
             <div class="container">
-                <div class="row">
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="..." alt="...">
-            <div class="caption">
-                <h3>Thumbnail label</h3>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a href="#" class="btn btn-primary" role="button">Button</a>  <a href="#" class="btn btn-default" role="button">Button</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="..." alt="...">
-            <div class="caption">
-                <h3>Thumbnail label</h3>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a href="#" class="btn btn-primary" role="button">Button</a>  <a href="#" class="btn btn-default" role="button">Button</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="..." alt="...">
-            <div class="caption">
-                <h3>Thumbnail label</h3>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a href="#" class="btn btn-primary" role="button">Button</a>  <a href="#" class="btn btn-default" role="button">Button</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="..." alt="...">
-            <div class="caption">
-                <h3>Thumbnail label</h3>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a href="#" class="btn btn-primary" role="button">Button</a>  <a href="#" class="btn btn-default" role="button">Button</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="..." alt="...">
-            <div class="caption">
-                <h3>Thumbnail label</h3>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a href="#" class="btn btn-primary" role="button">Button</a>  <a href="#" class="btn btn-default" role="button">Button</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="..." alt="...">
-            <div class="caption">
-                <h3>Thumbnail label</h3>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a href="#" class="btn btn-primary" role="button">Button</a>  <a href="#" class="btn btn-default" role="button">Button</a>
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
 
                 Ardoise Magique 2018</div>
         </div>
